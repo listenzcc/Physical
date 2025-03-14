@@ -40,7 +40,15 @@ class SpeakWilling:
 
         :return float: the new value in the range of (0, 1).
         '''
+        d = np.sum([self.fb(t+i*100) for i in range(4)])/4
+        return d
+
+    def fa(self, t):
         return 0.5 + 0.5 * np.tanh(7*np.sum(self.a * np.sin(t*np.sqrt(self.b))))
+
+    def fb(self, t):
+        d = np.sum([self.fa(t+i*10) for i in range(10)]) / 10
+        return d
 
 
 class Subject:
@@ -111,7 +119,7 @@ class RollingData:
         :param g float: the g value.
         :param name: the name of the subject.
         '''
-        if bd.t < 0.5:
+        if bd.t < 1.0:
             bd.s = bd.g
         else:
             dt = 0.05

@@ -40,11 +40,12 @@ class SpeakWilling:
 
         :return float: the new value in the range of (0, 1).
         '''
+        return self.fa(t)
         d = np.sum([self.fb(t+i*100) for i in range(4)])/4
         return d
 
     def fa(self, t):
-        return 0.5 + 0.5 * np.tanh(7*np.sum(self.a * np.sin(t*np.sqrt(self.b))))
+        return 1.0 + 1.0 * np.tanh(7*np.sum(self.a * np.sin(0.7*t*np.sqrt(self.b))))
 
     def fb(self, t):
         d = np.sum([self.fa(t+i*10) for i in range(10)]) / 10
@@ -127,21 +128,23 @@ class RollingData:
             m = 5
             n = 1.5
 
-            ds = self.peek(bd.t, 0.3)
-            print(set([e.name for e in ds]))
-            print(set([e.t for e in ds]))
+            data = self.peek(bd.t, 0.75)
 
+            # ds = self.peek(bd.t, 0.3)
+            ds = [e for e in data if e.t < bd.t and e.t > bd.t-0.3]
             a = np.sum([e.s for e in ds]) * dt / num_subjects
             ln = np.log(1+a/0.3) / np.log(2)
 
-            ds = self.peek(bd.t, 0.25)
+            # ds = self.peek(bd.t, 0.25)
+            ds = [e for e in data if e.t < bd.t and e.t > bd.t-0.25]
             c = np.sum([e.s for e in ds]) * dt / num_subjects
 
-            ds = self.peek(bd.t-0.5, 0.25)
+            # ds = self.peek(bd.t-0.5, 0.25)
+            ds = [e for e in data if e.t < bd.t-0.5 and e.t > bd.t-0.75]
             d = np.sum([e.s for e in ds]) * dt / num_subjects
 
-            psi = 0.5 + 0.5 * np.tanh(m*(2*(c-d) + n))
-            # print(bd.t, bd.g, ln, psi)
+            psi = 0.5 + 0.5 * np.tanh(m*((c-d) + n))
+            # print(bd.t, a, bd.g, ln, psi)
 
             bd.s = bd.g * ln * psi + 0.001 * bd.g
 
@@ -163,4 +166,5 @@ class RollingData:
     def _discard_loop(self):
         while True:
             self._discard(preserve_t=self.max_data_length)
+            print('GC!!!')
             time.sleep(self.max_data_length)

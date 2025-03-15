@@ -44,7 +44,7 @@ def grow():
             g = subject.speak_willing.generate(t)
             bd = BaseData(t=t, g=g, name=subject.name)
             rolling_data._queue.put_nowait(bd)
-        time.sleep(step)
+        time.sleep(0.05)
 
 
 Thread(target=grow, args=(), daemon=True).start()

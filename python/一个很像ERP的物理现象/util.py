@@ -45,7 +45,13 @@ class SpeakWilling:
         return d
 
     def fa(self, t):
-        return 1.0 + 1.0 * np.tanh(7*np.sum(self.a * np.sin(0.7*t*np.sqrt(self.b))))
+        if isinstance(t, np.ndarray):
+            d = []
+            for a, b in zip(self.a, self.b):
+                d.append(a * np.sin(0.7*t*np.sqrt(b)))
+            return 1.0 + 1.0 * np.tanh(7*np.sum(d, axis=0))
+        else:
+            return 1.0 + 1.0 * np.tanh(7*np.sum(self.a * np.sin(0.7*t*np.sqrt(self.b))))
 
     def fb(self, t):
         d = np.sum([self.fa(t+i*10) for i in range(10)]) / 10
@@ -58,7 +64,7 @@ class Subject:
 
     def __init__(self, name: str = 'Subject'):
         self.speak_willing = SpeakWilling()
-        self.speak_willing.mk_random(n=7, low=5, high=20)
+        self.speak_willing.mk_random(n=7, low=3, high=20)
         self.name = name
 
 

@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 import time
 import numpy as np
 from queue import Queue
@@ -32,7 +32,7 @@ class SpeakWilling:
         self.a = generate_irrational_numbers(n, low, high)
         self.b = generate_irrational_numbers(n, low, high)
 
-    def generate(self, t: float) -> float:
+    def generate(self, t: np.ndarray) -> float:
         '''
         Generate a new value based on the given time.
 
@@ -86,8 +86,8 @@ class RollingData:
     data: List[BaseData] = []
     max_data_length: float = 10.0  # seconds
 
-    _queue: Queue = None
-    _lock: RLock = None
+    _queue: Queue
+    _lock: RLock
 
     def __init__(self):
         self._queue = Queue()
@@ -98,7 +98,7 @@ class RollingData:
         Thread(target=self._discard_loop, args=(), daemon=True).start()
         Thread(target=self._fetch_queue_loop, args=(), daemon=True).start()
 
-    def peek(self, t: float = None, length: float = None) -> List[BaseData]:
+    def peek(self, t: Optional[float] = None, length: Optional[float] = None) -> List[BaseData]:
         '''
         Peek the data from the queue.
         The data range is (t-length, t].
